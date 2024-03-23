@@ -1,0 +1,546 @@
+1) sudo systemctl start docker  --> to start the Docker daemon service
+If you face any issue with starting the docker daemon then remove(sudo rm -f /etc/docker/daemon.json) the file /etc/docker/daemon.json and start it again with sudo systemctl start docker and it will work 
+
+2) sudo systemctl status docker  --> to check the status of services running on the system. Example, for checking the current status of the Docker daemon  
+3) systemctl is-active docker  --> to check whether docker is up and running or not
+
+4) docker pull hello-world
+5) docker images
+6) docker tag <Image_name/Repository_name>:<tag_name_to_unique_identify_the_image> <Image_name/Repository_name>:<new_tag_name_to_add>  --> you can add multiple tags to a specific image and a specific tag. Do "docker images", you would get the same image id 
+
+docker image inspect <image_id>  -->  you will be able to see all tags associated with this particular image 
+
+7) docker run hello-world  OR  docker container run hello-world
+
+docker search mysql  -->  I want to search all the images that contain "mysql". If you don't know whether a specific image with the specific name is present in the Docker Hub then do this.
+
+docker image history <image_id>  -->  to look at the history of an image
+
+docker image remove <image_id>  -->  to remove the image from local
+
+docker container pause <container_id>  --> you can also pause the container. Pause will basically stop the container
+docker container unpause <container_id>  --> you can also unpause the container
+
+docker container inspect <container_id>  --> to know the detailed information about the container
+
+docker container prune  -->  this will remove all the stopped containers
+
+docker container kill <container_id>  --> it essentially means you have to shut down right now. See the "Difference between 'docker container stop'(it gracefully stops the container. that means it will be given some time to terminate the running processes and then the container will be stopped) and 'docker container kill'(it stops the container non-gracefully. it means that it does not terminate the running processes before stopping the container)
+
+docker container run -p 5000:5000 -d --restart=always myfirstimage  --> '--restart=always' option will automatically start the container when the container is in stopped state and the docker service/docker application/docker daemon is restarted(just restart the host on which docker is running, automatically docker will be restarted)  
+
+docker system prune  --> All unused containers, images, networks and volumes will get deleted. If you want to do individually, you can do that by using the following commands
+docker container prune  --> All unused containers will get deleted
+docker image prune  --> All unused images will get deleted
+docker network prune  --> All unused networks will get deleted
+docker volume prune  --> All unused volumes will get deleted
+
+docker events  --> if you want to see what is happening with your docker environment and also what has happened within your docker environment then use this command
+
+docker top <container_id>  --> Displays the running processes of a container
+
+docker stats  --> this would show all the stats/metric(cpu usage, memory usage, memory limit, etc) regarding the container which are running 
+
+docker run -p 5000:5000 -m 512m --cpu-quota 50000 -d in28min/todo-rest-api-h2:1.0.0-RELEASE  --> you can set the memory limit and the cpu quota from what is available in the host machine to a container while creating it. Like here, we are setting the memory limit as 512 MB and assiging the cpu quota as 50% i.e., 50K(so it will use max 50% of your host cpu) 
+
+docker system df  --> this help us to see the amount of disk space used by the Docker daemon
+
+docker pull nignx:latest 
+In Dockerfile, we write, from nignx:latest --> latest is the tag
+
+docker run -dit nignx
+
+CMD is to run the docker command
+
+pwd
+ls -lrt
+
+docker build --help
+docker build -t myfirstimage .  --> dot represents the current directory where your Dockerfile is present
+
+docker run -d -p 90:80 myfirstimage  --> '-d' to launch up the container in detach mode
+
+docker ps --> to get all the running containers
+
+https://eeb60e8d716644f5985039ac420bb3f6-2886777861-90-host09nc.environments.katacoda.com/homepage.html
+
+docker build -t myfirstimage:v1.1 .
+
+
+docker run -d -p 91:80 myfirstimage:v1.1  (changed port to 91 because myfirstimage:latest is using the port 90. There will be conflict)
+
+docker container run -d --it -p 91:80 myfirstimage:v1.1
+
+docker container stop <image_id>   -->  to stop the running conatiner
+docker ps  -->  to see only the running conatiners
+docker ps -a --> to see all the conatiners(stopped and running)
+docker logs <container_id>
+
+docker container ls  --> to list all containers
+
+docker exec -it <container_id> /bin/sh--> to go inside the conatiner  --> cd /usr/share/nignx/html
+
+Whatever changes you made to the container will be lost when you stop the conatiner.
+
+docker container run --name tomcatcontainer -d -it -p 80:8080 sess1exer1
+curl localhost:80  --> To access Tomcat running inside the docker container(run this from the Ubuntu WSL)
+hostname -I  --> To get the IP address of the Ubuntu WSL(run this from the Ubuntu WSL)	
+http://172.20.59.61:80/sample/  --> To access the sample.war deployed in the Tomcat's webapps directory(172.20.59.61 is the IP of the Ubuntu WSL)
+
+docker container stop <container_name_or_id>
+docker container start <container_name_or_id>
+
+docker logs <container_name_or_id>  --> The docker logs command shows information logged by a running container
+
+docker exec -it <container_name_or_id> /bin/bash  or  docker exec -it <container_name_or_id> /bin/sh  --> To go inside the container (For Tomcat container, you can do ls and go inside the webapps folder)
+
+exit  -->  To come out of the container 
+
+Postgres Container:  docker run --name postgres-db -e POSTGRES_PASSWORD=voltage123 -p 5432:5432 -d postgres
+                     docker exec -it postgres-db bash  --> Going inside the postgres docker conatiner
+                     psql -h localhost -U postgres  --> Authenticating to postgresql db
+		     \l  --> to list all the available databases
+                     CREATE DATABASE tsl_employee;
+                     su - postgres  --> Switch to the Postgres user
+                     \q  --> to quit from the psql
+
+ 
+Docker volumes:
+Suppose you have created a Docker container and made some chnages on it. As and when kill the container, your chnages will be gone. Docker volume is something that persist your chnages.
+
+https://www.commandprompt.com/education/how-to-run-postgresql-and-pgadmin-using-docker/
+
+docker stop <container_id>  --> to stop a running container
+docker rm <container_id>  -->  to remove a stopped container
+
+docker rm <container_id> -f  --> to force delete the running container
+
+docker run -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=voltage123 -p 5433:5432 -d postgres --> (pgdata is volume name, postgres is image name) --> creating a docker conatiner of postgres with volume
+
+docker volume ls --> to list all the docker volumes created on your host
+docker inspect <name_of_the_volume_or_id>  --> to see the details of the specified docker volume
+
+To push image to Docker hub registry:
+================================================
+docker commit -m "my first custom image" <container_id> <docker_hub_username>/myimagelearning  --> This full(<docker_hub_username>/myimagelearning) is the image name. It creates the new image on the host --> do "docker images"
+
+docker login  --> give username and password
+
+docker push --help
+docker push <docker_hub_username>/myimagelearning
+docker pull <docker_hub_username>/myimagelearning
+
+
+Kubernetes(an orchestration tool):
+=================================================
+Kubernetes is nothing but a yaml file. Every yaml file is called as a Manifest file. Every Kubernetes object has to be defined in the yaml file. This technique is called As Infrastructure as Code. 
+
+kubectl get nodes  --> to view all nodes inside the cluster
+kubectl get pods  OR  kubectl get po  OR  kubectl get pods --all-namespaces  -->  to view all pods inside a worker node
+kubectl cluster-info
+
+kubectl create deployment hello-world-rest-api --image=in28min/hello-world-rest-api:0.0.1.RELEASE   --> this command will create a Deployment object named 'hello-world-rest-api', a ReplicaSet object and a Pod object. Kubernetes also provides a declarative configuration of deploying applications. You can specify YAML saying the state you would want and Kubernetes would make that happen.
+kubectl expose deployment hello-world-rest-api --type=LoadBalancer --port=8080    -->  this would expose a service(in other words, this would expose the deployment as a service) to the                       outside world on port 8080 as a LoadBalancer. This command will create a Service object. Kubernetes Service object of type LoadBalancer is created in Cloud Platforms(AWS, GCP, Azure) because these cloud platforms provide load balancing service which this Kubernetes Service object will be using. The great thing about these popular cloud providers is the fact that they provides an excellent integration between Kubernetes and their specific load balancer.
+
+kubectl set image deployment hello-world-rest-api hello-world-rest-api=in28min/hello-world-rest-api:0.0.2.RELEASE  -->  the command is to deploy a new version of your hello-world-rest-api application and upgrade from the application from 0.0.1.RELEASE to 0.0.2.RELEASE. Syntax: 'kubectl set image deployment <deployment_name> <container_name>=in28min/hello-world-rest-api:0.0.2.RELEASE'. Inside the deployment file, we specify the deployment name and container name. So, inside the hello-world-rest-api deployment, we are setting the new image of our application for the hello-world-rest-api container. 
+
+kubectl set image deployment hello-world-rest-api hello-world-rest-api=DUMMY_IMAGE:TEST  --> Suppose 'DUMMY_IMAGE:TEST' image is not presnt locally and in the docker hub. So, there is an issue/error while making the deployment of the newer/latest version of your application. Why am I setting it to an error? We want to see if this deployment would make your apllication go down. In other words, if this deployment would impact your already running deployment i.e., previous version of your application. Answer is your previous version of the application would still be running. So, even if you make any error while deploying the new version of your application, Kubernetes makes sure, that mistake would not impact your already running deployment. Do 'kubectl get rs -o wide' after this, you would see two replicaset. One for the previous version and another one for the new version of your application. This deployment will create the pods but the container inside them will not be created as image is not valid. Also, Do 'kubectl get pods', you would see the status of the pods as 'InvalidImageName'. Also, you can do 'kubectl describe pod <pod_name>' to see the events specific to this pod. Now, let's update the deployment with the correct/proper image. Run 'kubectl set image deployment hello-world-rest-api hello-world-rest-api=in28min/hello-world-rest-api:0.0.2.RELEASE' and then do 'kubectl get pods', you can see all the previous pods, irrespective of their status, which are related to this deployment, will be terminated/deleted and new pods will be created with the latest version(0.0.2.RELEASE) of your application.  
+
+kubectl apply -f conf.yaml  --> you can also have yaml configuration file stating about the desired state of deployment, service, etc kubernetes object. This is called a declarative approach.
+kubectl diff -f conf.yaml  -->  if you have run the conf.yaml file previously and now you have made some changes to it. So, before applying those changes by running 'kubectl apply -f conf.yaml', you can see the difference between what you already have and what you want to have by running this command. 
+
+kubectl get pods -o wide  -->  to get more details about the pods like the worker node on which a specific pod is residing, IP of the pod, etc. 
+
+kubectl explain pods   --> 'kubectl explain' is a generic command to get the text based lectures on the specified Kubernetes object
+kubectl explain deployment
+kubectl explain service
+kubectl explain replicaset
+
+kubectl describe pod <pod_name>  --> this command is to get all the details of a specific pod. you can get the pod name by running 'kubectl get pods'. If any issue occurs while creating the pod or while making the container up inside the pod, just look at the events happened in the cluster and also do describe of that pod to see the events happened related to that specific pod.
+
+kubectl get events  --> to see all the events which have been happened in your Kubernetes cluster
+kubectl get events --sort-by=.metadata.creationTimestamp  -->  'kubectl get events' does not give the occurred/happened events in a sorted order. If you want to see actually the events in atleast a little bit of sorted order then we need to add --sort-by option to it and provide the path to the creationTimestamp(this will sort the events based on the creation time). This command will give the details in a sorted order by time. 
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/website/master/content/en/examples/application/nginx-app.yaml
+
+kubectl describe deployment <deployment_object_name>  -->  For example, kubectl describe deployment my-nginx  (my-nginx is the deployment object name)
+
+kubectl get deployment  OR  kubectl get deployments
+kubectl get deployment <deployment_name> -o yaml  -->  get the specific deployment info in a YAML format
+
+kubectl get replicaset  OR  kubectl get replicasets  OR  kubectl get rs
+kubectl get rs -o wide  -->  to get some more informations about the replicasets
+
+kubectl get service  OR  kubectl get services  OR  kubectl get svc
+kubectl get svc --watch  --> to watch the changes happening to the service. For example, getting assigned with the external-ip
+kubectl get service <service_name> -o yaml  -->  get the specific service info in a YAML format
+
+kubectl --help
+
+kubectl get componentstatuses  -->  this command gives the status of all the components(etcd, controller-manager, scheduler, etc) of the master node.
+
+kubectl delete pod <pod_name>  OR  kubectl delete pods <pod_name>  -->  You can get the pod name by running "kubectl get pods"
+
+kubectl logs <pod_name>  -->  You can get the pod name by running "kubectl get pods". This will show you the logs of a specific pod
+kubectl logs -f <pod_name>  -->  If you want to follow the logs then you can also do that by running this command
+
+kubectl scale deployment <deployment_name> --replicas=2  -->  You can get the deployment name by running "kubectl get deployment"
+
+kubectl delete all -l app=curreny-exchange --> If you want to delete an existing deployment then you can delete based on the label. So, here, we are using the label app=curreny-exchange to delete all the kubernetes objects(deployment, service, pods, etc) which have that label attached to it. 
+
+kubectl create configmap <configmap_name> --from-literal=CURRENCY_EXCHANGE_URI=http://currency-exchange  --> this command creates a configmap kubernetes object with a configuration or an environment variable 'CURRENCY_EXCHANGE_URI=http://currency-exchange' 
+
+kubectl get configmap  --> to get all the configmap kubernetes objects
+kubectl get configmap <configmap_name>  -->  to get a specific configmap details
+kubectl get configmap <configmap_name> -o yaml  --> to get the details of a specific configmap in yaml format. To get the yaml configuration of a configmap 
+kubectl describe configmaps <configmap_name>  -->  to get the configurations/environment_variables present inside this specific configmap
+kubectl delete configmap <configmap_name>  -->  to delete a configmap
+
+kubectl rollout history deployment <deployment_name>  -->  you can access the deployment history in real-time by using the `kubectl rollout history` command for a specific deployment. In other words, you would want to get the rollout history for a specific deployment. This command allows you to view the revisions of a deployment, including information such as the revision number, the status of the rollout, and the date and time of the revision. Each deployment revision represents a unique version of the application. Kubernetes keeps a record of these revisions, allowing you to track changes, rollbacks, and updates over time. This command will display a list of all revisions, along with their corresponding revision numbers and status. You can also include additional flags, such as '--revision=', to get detailed information about a specific revision.
+
+kubectl rollout undo <deployment_name> --to-revision=2  -->  Another powerful aspect of deployment history in Kubernetes is the ability to rollback to previous revisions. Sometimes, a deployment may encounter issues or bugs that require you to revert to a previous working version. With deployment history, you can easily perform rollbacks without the need for manual intervention.
+
+kubectl autoscale deployment <deployment_name> --min=1 --max=3 --cpu-percent=70  -->  Autoscale the number of instances of my application/deployment based on the load on your application. Minimum number of instances/pods which should be always running is 1 and maximum number of instances/pods can be 3. We also have to specify when kubenetes decides to scale up and down. Here, We are saying that if the cpu usage percent is greater than 70 then a new pod would be created until a max of three. This command would create something called a horizontalpodautoscaler kubernetes object. 
+
+kubectl get horizontalpodautoscaler  OR  kubectl get hpa  --> to get all the autoscaling/horizontalpodautoscaler kubernetes object for all your deployments. horizontalpodautoscaler is responsible for autoscaling of your deployment. 
+
+kubectl delete hpa <horizontalpodautoscaler_name>  or  kubectl delete horizontalpodautoscaler <horizontalpodautoscaler_name>  -->  to delete the horizontalpodautoscaler kubernetes object
+
+kubectl top pod  --> to see the cpu and memory utilization of all your pods
+
+kubectl top nodes  -->  to see the cpu and memory utilization of all your nodes
+
+Notes: 
+There are many kubernetes objects like Pods, Deployment and Service, etc. 
+Pod is the smallest unit that you can create in the Kubernetes. It's a wrapper on top of the container. In other words, It runs the docker container. Question arises: why we need a wrapper on top of the conatiner? <Ans> Docker is one open source community and Kubernetes is another. They(kubernetes) wanted to add more functionality on top of the docker container. So, you are adding more to what is already there. Each Pod will have an IP associated to it.
+
+Pod specification(features which Kubernetes adds to the docker container):
+- CPU limit
+- Memory limit
+- Readiness Probe
+- Liveness Probe
+- Volume 
+
+Deployment:
+Deployment is the next level object. 1st we have pod and then we have deployment
+Use cases:
+	1. Ensuring right number of pods are running
+	2. Scale up or down
+	3. Roll out upgrades
+	4. Roll back or pause deployment
+
+Service:
+It exposes application to other pods and external users
+
+Kubernetes YAML file:
+Below are 4 main parts of the yaml file - 1) API version --> (Every kubernetes object has a version)  2) Kind --> (It means what are you creating? Pod or Service or something else?)  3) Metadata  4) Spec
+
+Example of Deployment Spec:
+===================================
+apiVersion: apps/v1
+kind: Deployment  --> (you are going to create a Deployment object)
+metadata:
+  name: backend   --> (you are giving the name to this Deployment object)
+spec:
+  selector:            --> (Always label, selector go together. So you have labels attached on your pods and you are using it to select the pods)
+    matchLabels:
+      app: hello
+      tier: backend
+      track: stable
+  replicas: 3		--> (Number of pods)  --> (Deployment object doesn't handle replicas. It creates a Replica Set object)
+  template:
+    metadata:		--> (some metadata of your pods)
+      labels:           --> (labels which we want to attach to our pods created)  -->  (labels are very important in kubernetes)
+        app: hello
+        tier: backend
+        track: stable
+    spec:
+      containers:
+      - name: nginx          --> (from here, my pod definition starts)  --> (specifying the name of the pod)
+        image: nginx:1.14.2   -->  (image from which container will be created)
+        ports:                --> (port at which we are exposing the pod)
+        - name: http
+          containerPort: 80
+
+Hands-on:
+=================
+Follow:  https://kubernetes.io/docs/tasks/access-application-cluster/connecting-frontend-backend/
+
+kubectl apply -f https://k8s.io/examples/service/access/backend-deployment.yaml
+kubectl get all  --> to see what are all your deployment has created  -->  (3 pods, 1 Deployment object and 1 Replica Set object will be created)  --> It will give all objects created
+kubectl describe deployment.apps/backend
+
+Services:
+=================
+Services provide a stable name for accessing pods.
+It helps pods to be accessed from another pods in the cluster and from external world.
+
+Why Services are needed?
+IP based communication is possible but won't work as pods are emphemeral.
+Number of pods changes during the life of deployment
+
+How do they work?
+There are 4 techniques:  ClusterIP, NodePort, LoadBalancer, ExternalName
+
+NodePort Service:
+Exposes application to external clients outside of the cluster
+
+YAML file for creating the Service object for backend pods which are created with YAML above:
+=======================================================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello   ---> (name of the Service object)
+spec:
+  selector:        --> (A Service uses selectors to find the Pods that it routes traffic to)
+    app: hello
+    tier: backend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: http
+
+
+Understand YAML configuration file:
+==================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app: currency-exchange   --> we are also attaching a label to this deployment kubernetes object
+  name: currency-exchange   --> We are giving this deployment kubernetes object a name
+  namespace: default      --> Assigning a namespace to it 
+spec:
+  replicas: 2   --> how many pods we would want. I want 2 pods
+  selector:      --> Inside the spec is where we try and match the deployment to the pods. we are saying this deployment is applicable for all the pods which have this label attached to it 
+    matchLabels:
+      app: currency-exchange
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:     --> This is the template for the pod
+    metadata:
+      labels:
+        app: currency-exchange     --> To the entire pods, we are applying/attaching a label. This is the label which is attached with all the pods of this deployment. 
+    spec:
+      containers:
+      - image: in28min/mmv2-currency-exchange-service:0.0.11-SNAPSHOT
+        imagePullPolicy: IfNotPresent
+        name: mmv2-currency-exchange-service
+        readinessProbe:
+          httpGet:
+            port: 8000
+            path: /actuator/health/readiness
+        livenessProbe:
+          httpGet:
+            port: 8000
+            path: /actuator/health/liveness
+      restartPolicy: Always   --> A pod can have multiple containers. If there is any issue with any one of these containers inside a pod the you can restart the container                 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: currency-exchange
+  name: currency-exchange
+  namespace: default
+spec:
+  ports:  --> What we are defining here is the ports
+  - port: 8000  --> on this port, expose the deployment which matches the below labels(under selector) 
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: currency-exchange  --> This Service object matches against the deployment object
+  sessionAffinity: None
+  type: LoadBalancer 
+
+
+1) In Deployment object yaml configuration, we can also specify something called a strategy. This is basically how an update to this deployment is done. In other words, how you will be upgrading your application which is running as part of this deployment. So, if I am upgrading from release 1 to release 2, how should the upgrade be done. Default strategy is rolling update. If the strategy is of type rolling update and if I have 4 instances of a microservice then these instances would be updated one at a time to the new version.  
+
+
+Configuring environment variables in the YAML configuration:
+=========================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app: currency-conversion
+  name: currency-conversion
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: currency-conversion
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: currency-conversion
+    spec:
+      containers:
+      - image: in28min/mmv2-currency-conversion-service:0.0.12-SNAPSHOT
+        imagePullPolicy: IfNotPresent
+        name: mmv2-currency-conversion-service
+        env:                                      -->  we can configure the environment variable for the container
+          - name: CURRENCY_EXCHANGE_URI
+            value: http://currency-exchange
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: currency-conversion
+  name: currency-conversion
+  namespace: default
+spec:
+  ports:
+  - port: 8100
+    protocol: TCP
+    targetPort: 8100
+  selector:
+    app: currency-conversion
+  sessionAffinity: None
+  type: LoadBalancer
+
+ 
+Configmap in kubernetes as a centralised configuration management:
+=======================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app: currency-conversion
+  name: currency-conversion
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: currency-conversion
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: currency-conversion
+    spec:
+      containers:
+      - image: in28min/mmv2-currency-conversion-service:0.0.12-SNAPSHOT
+        imagePullPolicy: IfNotPresent
+        name: mmv2-currency-conversion-service
+        envFrom:
+          - configMapRef:
+              name: currency-conversion   -->  name of the configmap object. We are asking kubernetes to make available all the configurations present inside this configmap to the pod     
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: currency-conversion
+  name: currency-conversion
+  namespace: default
+spec:
+  ports:
+  - port: 8100
+    protocol: TCP
+    targetPort: 8100
+  selector:
+    app: currency-conversion
+  sessionAffinity: None
+  type: LoadBalancer
+---
+apiVersion: v1
+data:
+  CURRENCY_EXCHANGE_URI: http://currency-exchange
+kind: ConfigMap
+metadata:
+  name: currency-conversion
+  namespace: default 
+
+
+Readiness and Liveness probe configuration for the microservice:
+==========================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app: currency-exchange
+  name: currency-exchange
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: currency-exchange
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: currency-exchange
+    spec:
+      containers:
+      - image: in28min/mmv2-currency-exchange-service:0.0.11-SNAPSHOT
+        imagePullPolicy: IfNotPresent
+        name: mmv2-currency-exchange-service
+        readinessProbe:                           -->  this is container specific 
+          httpGet:
+            port: 8000
+            path: /actuator/health/readiness
+	  failureThreshold: 3
+          periodSeconds: 10
+	  successThreshold: 1
+	  timeoutSeconds: 2
+        livenessProbe:                            -->  this is container specific 
+          httpGet:
+            port: 8000
+            path: /actuator/health/liveness
+          failureThreshold: 3
+          periodSeconds: 10
+	  successThreshold: 1
+	  timeoutSeconds: 2
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: currency-exchange
+  name: currency-exchange
+  namespace: default
+spec:
+  ports:
+  - port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: currency-exchange
+  sessionAffinity: None
+  type: LoadBalancer
+
+
+
+

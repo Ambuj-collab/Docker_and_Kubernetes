@@ -1,0 +1,88 @@
+Distibuted tracing: 
+===============================
+Let's consider a simple scenario. A request is flowing through multiple microservices and it's taking a lot of time. You want to find out how much time the request is spending in each of the microservice and you want to find out which microservice is consuming the most amount of time. That's where something called distributed tracing is really really useful. It helps you to trace the requests across microservices. So, you will be able to find the details of the request. 
+
+
+Kubernetes:
+====================
+1) Generally, you will have 1 master node in the kubernetes cluster but when you need high availability, you go for multiple master node.
+
+2) Why do we have so many Objects in Kubernetes? -->  The important thing to understand is that Kubernetes uses Single Responsibility Principle.
+
+3) Pod is the smallest deployable unit in Kubernetes. 
+
+4) 1/1, 3/3  --> when you do 'kubectl get pods', you would see something like this. It means how many containers are running inside the pod. 1/1 means one container is running inside the pod. 3/3 means three containers are running inside the pod. A pod can actually contain multiple containers. All the containers which are present inside the pod share resources like memory and CPU. Within the same pod, the containers can talk to each other using localhost.
+
+5) There are a lot of Kubernetes objects like pod, deployment, service, replicaset, etc. In Kubernetes, the way we link all these together is by using something called selectors and labels. Lables are really really important when we get to tying up a pod with a replicaset or a service.
+
+6) Namespace is very very important in Kubernetes. It provides isolation for part of the cluster from other parts of the same cluster. Let's say you have your DEV and QA environments running inside the same cluster. How do you seperate the kubernetes objects created for DEV env from the kubernetes objects created for QA env(how do you separate the resources of Dev from the resources of QA). One of the options is to create seperate namespaces for QA and DEV and associate each of the resources with that specific/appropriate namespace. In other words, Namespaces are a way to organize clusters into virtual sub-clusters — they can be helpful when different teams or projects share a Kubernetes cluster. Any number of namespaces are supported within a cluster, each logically separated from others but with the ability to communicate with each other.
+
+7) ReplicaSet ensures that a specific number of pods are running at all the times. The ReplicaSet always keeps monitoring the pods and if there are lesser number of pods than what is expected/needed then it created the pods.
+
+8) We would want zero downtime when we are updating our application to a newer version. This is possible only with the help of Kubernetes.
+
+9) Deployment is very very important in kubernetes. It makes sure that you are able to update the new releases of your application with zero downtime. The strategy which the deployment is using, by default, is something called rolling updates. Let's say I have 5 instances of V1 version of my application is running and I want to release the V2 version of the same application. The rolling update strategy updates one pod at a time. So, it launches a new pod with V2 version of your application running and once it launches up successfully, it reduces the number of running pods for V1 version of your application by 1. Next, it again increase the pod of V2 version and once it is up and running, it deletes a pod of V1 version of your application and so on and so forth until the number of pods for V1 version becomes zero. And then only all traffic will go to V2 version of your application. There are other deployment strategies that we will talk later. 
+
+10) In practice, you would see that a replicaset is always tied with a docker image. The pods, which that replicaset is managing, will be running running docker containers from that docker image only. If you want to see that a replicaset is attached to which docker image then run 'kubectl get rs -o wide' command. In other words, a replicaset is always tied with a specific release version.
+
+11) In the kubernetes world, a pod is a throw away unit. Your pods might go down, new pods might come up. New pod will have new Name, new IP, etc. The role of a service is to provide an always available external interface to the applications which are running inside the pods. A service basically allows your application to receive traffic through a permanent lifetime IP address. A service is created, when you run 'kubectl expose deployment ....', with an IP address. 
+
+12) Autoscaling of deployment and scaling of deployment, both are different things. If you do Autoscale of deployment that means, scaling up and scaling down would happen automatically based on the load on your application. If you do Scale of deployment that means, you are scaling up and scaling down at the same/current instant. 
+
+13) One disadvantage of the NodePort Kubernetes Service is that it doesn't do any kind of load balancing across multiple nodes.  So, only LoadBalancer Kubernetes service can do load balancing with the help of cloud providers's specific service for load balancing.
+
+14) In Kubernetes, we set the desired state of our application and what kubernetes does is that it maintains that state at any given point of time. We say to kubernetes that I would want 10 instances of application A and I would want 15 instances of application B. That's what is called the desired state. The desired state is stored in etcd(distributed database of master node). etcd is a component of master node. 
+
+15) The kubectl command line tool submits your requests to the API Server(kube-apiserver). So, basically we interact with the kube-apiserver to get our work done.
+
+16) The Scheduler is responsible for scheduling the pods onto the nodes(worker nodes). In kubernetes cluster, you will have several nodes and we are creating a new pod, you need to decide which node the pod has to be scheduled on to. You can specify on which node you want your pod to be. If you don't then kubernetes decides the node based on the available memory, CPU on the worker nodes and a lot of other factors. So, Scheduler considers all those factors and schedules the pod onto the appropriate node. 
+
+17) The controller manager(kube-controller-manager) manages the overall health of the cluster. Whenever we are executing kubectl command, we are updating the desired state. The kube-controller-manager makes sure to meet whatever desired state we want. In other words, it makes sure that the actual state of the kubernetes cluster matches the desired state.
+
+18) Every worker node has a node agent called kubelet. The job of the kubelet is to make sure that it monitors what's happening on the node and communicates it back to the master node. So, if a pod go down, kubelet reports it to the controller manager(component of master node).
+
+19) What happens if the master node goes down? Will your application go down? Answer is no. Your application would still be running. 
+
+20) Kubernetes also provides its own configuration management using config maps and it provides its own service discovery. 
+
+21) The kubelet uses readiness probes to know when a container is ready to start accepting traffic. A Pod is considered ready when all of its containers are ready. 
+
+22) Startup Probe:
+A startup probe verifies whether the application within a container is started. Startup probes run before any other probe, and, unless it finishes successfully, disables other probes. If a container fails its startup probe, then the container is killed and follows the pod’s restartPolicy.
+This type of probe is only executed at startup, unlike readiness probes, which are run periodically.
+The startup probe is configured in the spec.containers.startupprobe attribute of the pod configuration.
+
+23) Readiness Probe
+Readiness probes determine whether or not a container is ready to serve requests. If the readiness probe returns a failed state, then Kubernetes removes the IP address for the container from the endpoints of all Services.
+Developers use readiness probes to instruct Kubernetes that a running container should not receive any traffic. This is useful when waiting for an application to perform time-consuming initial tasks, such as establishing network connections, loading files, and warming caches.
+The readiness probe is configured in the spec.containers.readinessprobe attribute of the pod configuration.
+
+24) Liveness Probe
+Liveness probes determine whether or not an application running in a container is in a healthy state. If the liveness probe detects an unhealthy state, then Kubernetes kills the container and tries to redeploy it.
+The liveness probe is configured in the spec.containers.livenessprobe attribute of the pod configuration.
+
+25) For two microservices communication, both are exposed to the outside world using service kubernetes object, kubernetes make some environment variables available to the created pods. So, you can use them in the caller/client microservice code to invoke another(server) microservice. So, in all of your pods, related to your deployment, all the existing Kubernetes services information(environment variables) will be made available by the kubernetes. 
+
+26) Kubernetes also provides a declarative configuration of deploying applications. You can specify YAML saying the state you would want and Kubernetes would make that happen. Suppose yaml configuration file name is 'conf.yaml' then I can run that yaml file to apply all the changes by using 'kubectl apply -f conf.yaml' command. 
+
+27) Service kubernetes object is used to expose your deployment to the outside world. 
+
+28) Deploying microservices using kubernetes YAML configuration
+
+29) Kubernetes also provides centralized configuration option using configmap. configmap is nothing but a map of key-value pair inside it. 
+
+30) All the typical features, which are needed by microservices(service discovery, load balancing, centralized configuration management), are provided for free by kubernetes.  
+
+31) Suppose you have a application with 2 microservices. v1 of your application is already running with 1 instance of all your microservices. When you deploy a new version v2 of your application and below is the strategy you are using in the yaml configuration file then there will be downtime while deploying. With below strategy, if more than or equal to 2(example, 4) instances of all your microservices are running then there will be no downtime. 
+
+strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+	
+The way we can avoid that is by using the Liveness and Readiness probes which are provided by kubernetes. So, there are certain probes which are provided by kubernetes. You can configure them to help kubernetes check the status of an application. So, Kubernetes uses probes to check the health of a microservice. If readiness probe is not successful then traffic is not sent to it. In other words, if for any specific microservice, you have configured the readiness probe and if the readiness probe is not successful then kubernetes will not send any traffic to that specific microservice.
+
+There is another thing called the liveness probe which you can configure. If the liveness probe is not successful then pod is restarted. 
+
+These 2 probes are really really useful when it comes to making the microservices highly available. Spring boot actuator provides inbuilt readiness probe and liveness probe. We can use these endpoints/probes, which are provided by spring boot actuator, and configure them to ensure that there is no downtime when we are deploying our applications/microservices. These probes help kubernetes discover whether the application(new version of your application) is ready to accept traffic or not. If the application is not ready to receive traffic then it will not terminate the old version of it. It will terminate the old pods only when the new pods are ready to receive traffic.    
